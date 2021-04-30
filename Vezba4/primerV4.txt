@@ -1,0 +1,48 @@
+//glavni.c
+
+#include "sabiranje.h"
+#include "oduzimanje.h"
+
+void main()
+{
+	int a;
+	a = saberi(1, oduzmi(4, 2));
+
+	while(1);
+	}
+
+
+/*****************/
+//sabiranje.h
+
+int saberi(int a, int b);
+
+/****************/
+
+//sabiranje.c
+
+#include "sabiranje.h"
+
+int saberi(int a, int b)
+{
+	return (a + b);
+	}
+
+/*****************/
+
+//oduzimanje.h
+int oduzmi(int a, int b);
+
+/****************/
+
+//oduzimanje.c
+#include "oduzimanje.h"
+
+int oduzmi(int a, int b)
+{
+	if(a > b)
+		return (a - b);
+	else
+		return (b - a);
+	}
+
