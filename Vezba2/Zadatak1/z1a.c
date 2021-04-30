@@ -1,3 +1,11 @@
+/**
+ * @file zad1a.c
+ * @brief opis datoteke
+ * @author Ljubica Potrebic
+ * @date 30.04.2021.
+ * @version 1.0
+ */
+
 #include <avr/io.h>
 #include <util/delay.h>
 
@@ -15,3 +23,4 @@ int main(){
 
 	return 0;
 }
+
