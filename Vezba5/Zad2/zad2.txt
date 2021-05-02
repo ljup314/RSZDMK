@@ -1,0 +1,111 @@
+// timer0.c
+
+/**
+ * @file timer0.c
+ * @author Ljubica Potrebic
+ * @date 2.5.2021.
+ * @version 1.0
+ */
+
+
+#include "timer0.h"
+
+/// Sistemsko vreme
+volatile uint32_t ms = 0;
+
+/**
+ * ISR - prekidna rutina timera 0 u modu CTC
+ */
+ISR(TIMER0_COMPA_vect)
+{
+	ms++; //prekidna rutina se generise svake ms pa se broj ms inkrementira
+}
+
+/**
+ * timer0InteruptInit - fja koja inicijalizuje timer0 tkd pravi prekide svake milisekunde
+ * @return - nema povratnu vrednost
+ */
+void timer0InteruptInit()
+{
+	TCCR0A = 0x02; //tajmer se prebacuje u CTC mod
+
+	// Provera frekvencije takta prilikom kompilacije pomocu predprocesorske direktive
+#if F_CPU > 20000000
+#error "Frekvencija takta mora biti manja od 20MHz!"
+#endif
+
+	// Inicijalizacija promenljivih za preskaler i periodu tajmera 0
+	uint32_t n = F_CPU / 1000; // n - faktor skaliranja
+	uint8_t clksel = 1;
+
+	// Odredjivanje vrednosti preskalera i periode tajmera 0
+	while(n > 255){
+		n /= 8; // zelimo da n upadne u opseg 0 - 255
+		clksel++;
+	}
+
+	TCCR0B = clksel;
+	OCR0A = (uint8_t)(n & 0xff) - 1; // vrsi se konverzija u 8b podatak, to cinimo tako sto od 32b podatka n odsecemo gornjih 24 i ostavimo donjih 24b
+	TIMSK0 = 0x02; // Dozvola prekida
+	sei(); // Globalna dozvola prekida
+}
+
+/**
+ * timer0millis - fja koja bezbedno vraca kao povratnu vrednost broj ms proteklih od spustanja naseg koda na plocu
+ * @return - povratna vrednost je tipa uint32_t i ima vrednost broja ms proteklih od pocetka merenja vremena
+ */
+uint32_t timer0millis()
+{
+	uint32_t tmp;
+	cli(); // Zabrana prekida
+	tmp = ms; // Ocitavanje vremena
+	sei(); // Dozvola prekida
+	return tmp;
+}
+
+/**
+ * timer0DelaysMs - fja koja implementira pauzu u broju ms koji je prosledjen kao parametar
+ * @param delay_length - ulaz tipa uint32_t - duzina pauze u ms
+ * @return - povratna vrednost je tipa unsigned long i ima vrednost broja ms proteklih od pocetka aplikavije do trenutka izlaska iz fje
+ */
+void timer0DelayMs(uint32_t delay_length)
+{
+	uint32_t = timer0millis(); //na pocetku ocitamo sistemsko vreme
+	while(timer0millis() - t0 < delay_length);
+}
+
+
+// timer0.h
+
+#ifndef TIMER0_H_
+#define TIMER0_H_
+
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <stdint.h>
+
+/**
+ *  ISR - prekidna rutina taajmera 0 u modu CTC
+ */
+ISR(TIMER0_COMPA_vect);
+
+/**
+ * timer0InteruptInit - fja koja inicijalizuje timer0 tkd pravi prekide svake milisekunde
+ * @return - nema povratnu vrednost
+ */
+void timer0InteruptInit();
+
+/**
+ * timer0millis - fja koja bezbedno vraca kao povratnu vrednost broj ms proteklih od spustanja naseg koda na plocu
+ * @return - povratna vrednost je tipa uint32_t i ima vrednost broja ms proteklih od pocetka merenja vremena
+ */
+uint32_t timer0millis();
+
+/**
+ * timer0DelaysMs - fja koja implementira pauzu u broju ms koji je prosledjen kao parametar
+ * @param delay_length - ulaz tipa uint32_t - duzina pauze u ms
+ * @return - povratna vrednost je tipa unsigned long i ima vrednost broja ms proteklih od pocetka aplikavije do trenutka izlaska iz fje
+ */
+void timer0DelayMs(uint32_t delay_length);
+
+#endif /* TIMER0_H_ */
