@@ -6,15 +6,22 @@
  * @date 15.5.2021.
  */
 
+/// Biblioteka koja omogucava delay
 #include <util/delay.h>
+
+/// Biblioteka koja omogucava citanje integer tipova
 #include <stdint.h>
+
+/// Biblioteka sa funkcijama za koriscenje stringova
 #include <stdlib.h>
+
+/// Biblioteka za serijsku komunikaciju
 #include "../usart/usart.h"
 
 int8_t user[] = "ljup"; // Pravimo niz karaktera za username; unapred predefinisan
 int8_t pass[] = "jej"; // Niz karaktera za password; unapred predefinisan
 
-main()
+int main()
 {
 
 	int8_t usinput[64]; // Username koji unosimo
@@ -28,6 +35,12 @@ main()
 	while(1)
 	{
 		indikator = 1;
+
+		/**
+		 * usartPutString() - fja koja ispisuje na serijskom izlazu string
+		 * @param - string koji unosimo
+		 * @return nema povratnu vrednost
+		 */
 
 		usartPutString("Unesite korisnicko ime: ");
 		while(!usartAvailable())
